@@ -1,9 +1,9 @@
 ---
-title: "Presentation Title"
-subtitle: "Meeting or Forum"
-author: "Ankur Verma"
+title: "Insights Workshop"
+subtitle: "ODA/ODCS Face-to-Face"
+author: "Matthew Kumar, Bharath Sunkavalli"
 institute: "Bayer"
-date: "August 9 2020"
+date: "October 12 2022"
 output:
   xaringan::moon_reader:
     chakra: libs/remark-latest.min.js
@@ -24,6 +24,7 @@ knitr::opts_chunk$set(warning = F, comment = "", cache = F, message = F)
 #load dependencies here
 library(tidyverse)
 library(plotly)
+library(flipbookr)
 
 #load any standalone scripts from here
 source("assets/scripts/example_data.R")
@@ -33,17 +34,39 @@ class: inverse, title-slide
 <div style= "float:right;position: relative; left: 30px; bottom: -450px;">
 ```{r echo=FALSE, out.width="150px", fig.align='right'}
 knitr::include_graphics("assets/images/cross1.png") 
+
+
+data <-
+	readr::read_csv(
+		'https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-10-13/datasaurus.csv'
+	) %>%
+	mutate(category = case_when(
+		dataset == "dino" ~ "A",
+		dataset == "away" ~ "B",
+		dataset == "h_lines" ~ "C",
+		dataset == "v_lines" ~ "D",
+		dataset == "x_shape" ~ "E",
+		dataset == "star" ~ "F",
+		dataset == "high_lines" ~ "G",
+		dataset == "dots" ~ "H",
+		dataset == "circle" ~ "I",
+		dataset == "bulleyes" ~ "J",
+		dataset == "slant_up" ~ "K",
+		dataset == "slant_down" ~ "L",
+		TRUE ~ "M"
+	)) %>%
+	select(category, x, y)
 ```
 </div>
 <br>
 <br>
 <br>
-# Presentation Title
-## Meeting or Forum
+# Insights Workshop
+## ODA/ODCS Face-to-Face
 <br>
-### Ankur Verma
+### Matthew Kumar, Bharath Sunkavalli
 ### Bayer
-### August 9, 2022
+### October 12-13 2022
 
 ---
 class: inverse, bullet
@@ -52,120 +75,89 @@ class: inverse, bullet
 
 1. Introduction
 
-2. Part I
+2. Live Demonstration
 
-3. Part II
-
-4. Part III
-
-5. Questions
+3. Room Assignments
 
 ---
 class: inverse, center, middle
 
-# Section Slide
+# Introduction
+
+
+---
+class: inverse, center, middle
+
+# Live Demonstration
 
 ---
 class: inverse
 
-<div style= "float:right;position: relative; left: 30px; bottom: -250px;">
-```{r echo=FALSE, out.width="500px", fig.align='right'}
-knitr::include_graphics("assets/images/hex.png") 
-```
-</div>
-  
-# Tidyverse
-  
-*"The tidyverse is an **opinionated collection of R packages** designed for data science. All packages share an underlying design philosophy, grammar, and data structures."*
-<p style="margin-left:13%;color:#89D329">-Tidyverse.org</p>
-  
-<br>
-<br>
-<br>
-  
-- Packages play well with each other
-
-- Maintained, tested and documented
-
-- Inspired, growing ecosystem
-
-- Coverage along the data analytic workflow
-
-- `> install.packages("tidyverse")`
-
-
 ---
-# A Tidy Workflow
-  
-```{r echo=FALSE, out.width="900px", fig.align='center', fig.cap = "Image Credit: https://beanumber.github.io/tidy-databases"}
-knitr::include_graphics("assets/images/pipeline.png") 
+
+`r chunk_reveal("intro", widths = c(1,1), title = "# New Data")`
+
+```{r intro, include = FALSE, comment = ""}
+# structure
+str(data)
+
+# values
+unique(data$category)
+
+# layout
+head(data, n = 10)
 ```
 
 ---
-class: inverse 
 
-# tidyr
+`r chunk_reveal("intro2", widths = c(1,1), title = "# Investigate")`
 
-## Tidy Data
+```{r intro2, include = FALSE, comment = ""}
+# summary stats
+data %>%
+	summarise(across(c(x,y), list(Mean = mean, SD = sd)))
 
-- Helpers to transform `raw` data into a tidy format 
-
-- Tidy Format:
-  
-  > Every Column is a `variable` 
-
-  > Every Row is an `observation`
-
-  > Every Cell is a `single value`
-
-<br>
-
-- Package contains many odds and ends that fit a variety of scenarios
-
-- Let's look at a few interesting (and common) ones
-
-```{r echo=FALSE}
-htmltools::img(src = knitr::image_uri("assets/images/tidyr.png"), 
-               alt = 'logo', 
-               style = 'position:absolute; top:0; right:0; padding:30px; width: 175px; height: 175px')
+# summary stats by category
+data %>%
+	group_by(category) %>%
+	summarise(across(c(x,y), list(Mean = mean, SD = sd)))
 ```
+???
+
 ---
-class: inverse, bullet
+`r chunk_reveal("intro3", widths = c(1,1), title = "# Visualize?")`
 
-# tidyr
-
-## pivot_()
-
-- The `pivot_()` family of functions reshape data
-
-  - `pivot_wider()` - long data to wide data
-
-  - `pivot_longer()` - wide data to long data
-
-- Similar to SAS `proc transpose`
-
-- Many additional options (e.g. prefix, suffix)
-
-```{r echo=FALSE}
-htmltools::img(src = knitr::image_uri("assets/images/tidyr.png"), 
-               alt = 'logo', 
-               style = 'position:absolute; top:0; right:0; padding:30px; width: 175px; height: 175px')
+```{r intro3, include = FALSE, comment = ""}
+# plot
+ggplot(data, aes(x, y, color = y)) +
+	geom_point()  +
+	scale_colour_viridis_c(option = "inferno")
 ```
+???
+
+---
+`r chunk_reveal("intro4", widths = c(1,1), title = "# Visualize!")`
+
+```{r intro4, include = FALSE, comment = ""}
+# plot
+ggplot(data, aes(x, y, color = y)) +
+	geom_point()  +
+	scale_colour_viridis_c(option = "inferno") +
+	facet_wrap(~category)  
+```
+!!!
 ---
 class: inverse, center, middle
+# Group Assignments
 
-# ggplotly ex
-
-```{r, echo = FALSE}
-
-p <- ggplot(iris, aes(color = Species, x = Petal.Length, y = Petal.Width)) +
-			geom_point() +
-	    theme_dark()
-
-ggplotly(p)
-```
 ---
-class: inverse, center, middle
+class: center, middle
+# go/ODAinsights
+## go/ODAinsights
+### go/ODAinsights
 
-# Thank You!
 
+---
+class: center, middle
+
+<iframe src="https://matt-portfolio.shinyapps.io/odainsights/" height="600" width="1000" style="border: 1px solid #464646;" allowfullscreen="" allow="autoplay" data-external="1"></iframe>
